@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace WpfCalculator2025
+namespace WpfCalculator2025.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
