@@ -1,4 +1,6 @@
-﻿namespace WpfCalculator2025.Model
+﻿using System.Windows;
+
+namespace WpfCalculator2025.Model
 {
     /// <summary>
     /// 電卓の状態保持制御クラス
@@ -19,6 +21,9 @@
 
         private string _lastInput = InitialLastInput;
         private string _lastResult = InitialLastResult;
+
+        // 計算処理割り当て機能
+        private readonly ComputeProcessDispatcher _computeProcessDispatcher = new ComputeProcessDispatcher();
 
         /// <summary>
         /// 表示用文字列
@@ -108,20 +113,15 @@
                 _previousInput = _lastResult;
             }
 
-            switch (_operator)
-            {
-                case "+":
-                    var previousValue = decimal.Parse(_previousInput);
-                    var currentValue = decimal.Parse(_currentInput);
+            var previousValue = decimal.Parse(_previousInput);
+            var currentValue = decimal.Parse(_currentInput);
 
-                    var resut = previousValue + currentValue;
+            // 演算子に該当する処理
+            var computeProcess = _computeProcessDispatcher.Dispatch(_operator);
+            var result = computeProcess.Compute(previousValue, currentValue);
 
-                    _displayText = resut.ToString();
-                    _lastResult = resut.ToString();
-                    break;
-                default:
-                    break;
-            }
+            _displayText = result.ToString();
+            _lastResult = result.ToString();
 
             _lastInput = inputOperator;
         }
