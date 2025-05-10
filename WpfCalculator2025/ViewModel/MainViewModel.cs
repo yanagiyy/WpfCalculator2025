@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using log4net;
 using WpfCalculator2025.Model;
 
 namespace WpfCalculator2025.ViewModel
@@ -8,6 +9,7 @@ namespace WpfCalculator2025.ViewModel
     {
 
         private CalculatorContext _calculatorContext = new CalculatorContext();
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(MainViewModel));
 
         public MainViewModel()
         {
@@ -20,6 +22,8 @@ namespace WpfCalculator2025.ViewModel
         [RelayCommand]
         private void KeyInput(string key)
         {
+            _logger.Info($"InputKey:{key}");
+
             // 数字キー or ドット
             if (char.IsDigit(key, 0) || key == ".")
             {
@@ -47,6 +51,7 @@ namespace WpfCalculator2025.ViewModel
             }
 
             DisplayText = _calculatorContext.DisplayText;
+            _logger.Info($"DisplayText:{DisplayText}");
         }
     }
 }
