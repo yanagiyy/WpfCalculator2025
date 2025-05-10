@@ -321,5 +321,23 @@ namespace WpfCalculator2025.Model.Tests
             Assert.AreEqual(_context.DisplayText, "0");
         }
 
+        [TestMethod()]
+        public void 桁追加で小数点以下5桁より多い入力は無視されること()
+        {
+            var _context = new CalculatorContext();
+
+            _context.AddDigit(".");
+            _context.AddDigit("0");
+            _context.AddDigit("0");
+            _context.AddDigit("0");
+            _context.AddDigit("0");
+            _context.AddDigit("0");
+
+            _context.AddDigit("0"); // 無視される
+            _context.AddDigit("0"); // 無視される
+
+            Assert.AreEqual(_context.DisplayText, "0.00000");
+        }
+
     }
 }

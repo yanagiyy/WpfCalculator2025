@@ -51,6 +51,7 @@ namespace WpfCalculator2025.ViewModel
             }
 
             DisplayText = _calculatorContext.DisplayText;
+
             _logger.Info($"DisplayText:{DisplayText}");
         }
     }

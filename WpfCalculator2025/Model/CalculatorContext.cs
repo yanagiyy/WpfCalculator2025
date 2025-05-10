@@ -1,4 +1,6 @@
-﻿namespace WpfCalculator2025.Model
+﻿using System.Text.RegularExpressions;
+
+namespace WpfCalculator2025.Model
 {
     /// <summary>
     /// 電卓の状態保持制御クラス
@@ -87,7 +89,10 @@
             }
             else
             {
-                _currentInput += input;
+                if (!Regex.IsMatch(_currentInput, @"\.\d{5}$"))
+                {
+                    _currentInput += input;
+                }   
             }
 
             _displayText = _currentInput;
