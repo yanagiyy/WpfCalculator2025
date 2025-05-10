@@ -7,6 +7,7 @@ namespace WpfCalculator2025.ViewModel
 {
     internal partial class MainViewModel : ObservableObject
     {
+        private const int MaxDecimals = 5;
 
         private CalculatorContext _calculatorContext = new CalculatorContext();
         private static readonly ILog _logger = LogManager.GetLogger(typeof(MainViewModel));
@@ -50,9 +51,37 @@ namespace WpfCalculator2025.ViewModel
                 // nop
             }
 
-            DisplayText = _calculatorContext.DisplayText;
+            var raw = _calculatorContext.DisplayText;
+            DisplayText = FormatTruncate(raw, MaxDecimals);
 
             _logger.Info($"DisplayText:{DisplayText}");
+        }
+
+
+        /// <summary>
+        /// 指定桁数で切り捨て
+        /// </summary>
+        /// <param name="text">元</param>
+        /// <param name="maxDecimals">最大桁数</param>
+        /// <returns></returns>
+        private static string FormatTruncate(string text, int maxDecimals)
+        {
+            int dot = text.IndexOf('.');
+            if (dot < 0)
+            {
+                // 小数点がなければそのまま
+                return text;
+            }
+
+            int fractionLength = text.Length - dot - 1;
+            if (fractionLength <= maxDecimals)
+            {
+                // すでに5桁以下なら変更不要
+                return text;
+            }
+
+            // 小数点＋5桁分だけを残して切り捨て
+            return text.Substring(0, dot + 1 + maxDecimals);
         }
     }
 }
