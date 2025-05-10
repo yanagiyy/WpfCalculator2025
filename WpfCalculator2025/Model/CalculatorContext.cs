@@ -20,7 +20,10 @@ namespace WpfCalculator2025.Model
         private string _displayText = InitialDisplayTex;
 
         private string _lastInput = InitialLastInput;
+        private bool _isSetOperatorJust;
         private string _lastResult = InitialLastResult;
+
+        private bool _isComputeJustExecuted = false;
 
         // 計算処理割り当て機能
         private readonly ComputeProcessDispatcher _computeProcessDispatcher = new ComputeProcessDispatcher();
@@ -55,7 +58,7 @@ namespace WpfCalculator2025.Model
         /// 演算実行直後判定
         /// </summary>
         /// <returns></returns>
-        private bool isComputeJustEnterd => _lastInput == "=";
+        //private bool isComputeJustEnterd => _lastInput == "=";
 
         /// <summary>
         /// 計算可能状態判定
@@ -89,14 +92,25 @@ namespace WpfCalculator2025.Model
             }
             else
             {
-                if (!Regex.IsMatch(_currentInput, @"\.\d{5}$"))
+                // 演算子入力直後
+                if (_isSetOperatorJust)
                 {
-                    _currentInput += input;
-                }   
+                    _currentInput = input;
+        
+                }
+                else
+                {
+                    if (!Regex.IsMatch(_currentInput, @"\.\d{5}$"))
+                    {
+                        _currentInput += input;
+                    }
+                }
             }
 
             _displayText = _currentInput;
             _lastInput = input;
+            _isSetOperatorJust = false;
+            _isComputeJustExecuted = false;
         }
 
         /// <summary>
@@ -110,6 +124,7 @@ namespace WpfCalculator2025.Model
             _lastInput = InitialLastInput;
             _lastResult = InitialLastResult;
             _displayText = InitialDisplayTex;
+            _isComputeJustExecuted = false;
         }
 
         /// <summary>
@@ -118,31 +133,42 @@ namespace WpfCalculator2025.Model
         /// <exception cref="NotImplementedException"></exception>
         public void Compute(string inputOperator = "=")
         {
-            if (isComputeJustEnterd)
+            if (_lastInput == "=" && inputOperator == "=")
             {
                 // 連続演算の場合は直前の結果に対して同じ計算を繰り返す
                 _previousInput = _lastResult;
             }
 
-            if (canConpute || (canConpute && isComputeJustEnterd))
+
+
+            if (_operator == InitialOperator)
             {
-                var previousValue = decimal.Parse(_previousInput);
-                var currentValue = decimal.Parse(_currentInput);
+                _lastResult = _currentInput;
+                _displayText = _currentInput;
+            }
+            else
+            {
+                var previousValue = _previousInput == InitialPreviousInput ? 0 : decimal.Parse(_previousInput);
+                var currentValue = _currentInput == InitialCurrentInput ? 0 : decimal.Parse(_currentInput);               
 
                 // 演算子に該当する処理
                 var computeProcess = _computeProcessDispatcher.Dispatch(_operator);
                 var result = computeProcess.Compute(previousValue, currentValue);
 
+                //_currentInput = result.ToString();
+                _isComputeJustExecuted = true;
                 _displayText = result.ToString();
                 _lastResult = result.ToString();
             }
-            else
-            {
-                // 計算した状態にする
-                var input = string.IsNullOrEmpty(_currentInput) ? "0" : _currentInput;
-                _previousInput = input;
-                _lastResult = input;
-            }
+
+            //}
+            //else
+            //{
+            //    // 計算した状態にする
+            //    var input = string.IsNullOrEmpty(_currentInput) ? "0" : _currentInput;
+            //    _previousInput = input;
+            //    _lastResult = input;
+            //}
 
             _lastInput = inputOperator;
         }
@@ -153,8 +179,13 @@ namespace WpfCalculator2025.Model
         /// <param name="inputOperator">演算子文字列</param>
         public void SetOperator(string inputOperator)
         {
+            if(_lastInput == "=")
+            {
+                _operator = InitialOperator;
+            }
+
             // 演算子で計算する場合の判定
-            if (canConpute && _lastResult == InitialLastResult)
+            if (canConpute && !_isSetOperatorJust)
             {
                 Compute(inputOperator);
             }
@@ -166,20 +197,21 @@ namespace WpfCalculator2025.Model
             }
             else
             {
-                if (isComputeJustEnterd)
+                if (_isComputeJustExecuted)
                 {
                     _previousInput = _lastResult;
                 }
-                else
+                else 
                 {
                     _previousInput = _currentInput;
                 }
 
-                _currentInput = InitialCurrentInput;
+               // _currentInput = InitialCurrentInput;
             }
 
             _operator = inputOperator;
             _lastInput = inputOperator;
+            _isSetOperatorJust = true;
         }
     }
 }

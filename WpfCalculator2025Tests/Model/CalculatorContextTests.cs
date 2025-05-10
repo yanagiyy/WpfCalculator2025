@@ -232,6 +232,8 @@ namespace WpfCalculator2025.Model.Tests
             _context.AddDigit("2");
             _context.Compute();
 
+            Assert.AreEqual(_context.DisplayText, "3");
+
             // 3 +
             _context.SetOperator("+");
 
@@ -339,5 +341,54 @@ namespace WpfCalculator2025.Model.Tests
             Assert.AreEqual(_context.DisplayText, "0.00000");
         }
 
+        [TestMethod()]
+        public void オペレータの入力で演算を複数回続けられること()
+        {
+            var _context = new CalculatorContext();
+
+            _context.AddDigit("1");
+
+            _context.SetOperator("+");
+            _context.AddDigit("2");
+            _context.SetOperator("+");
+
+            Assert.AreEqual(_context.DisplayText, "3");
+
+            _context.AddDigit("3");
+            _context.SetOperator("+");
+
+            Assert.AreEqual(_context.DisplayText, "6");
+
+            _context.AddDigit("4");
+            _context.SetOperator("+");
+
+            Assert.AreEqual(_context.DisplayText, "10");
+
+            _context.AddDigit("5");
+            _context.SetOperator("+");
+
+            Assert.AreEqual(_context.DisplayText, "15");
+        }
+
+        [TestMethod()]
+        public void 連続計算できること()
+        {
+            var _context = new CalculatorContext();
+            _context.AddDigit("1");
+            _context.SetOperator("+");
+            _context.AddDigit("3");
+
+            _context.SetOperator("+");
+
+            Assert.AreEqual(_context.DisplayText, "4");
+
+            _context.Compute();
+
+            Assert.AreEqual(_context.DisplayText, "8");
+            
+            _context.Compute();
+
+            Assert.AreEqual(_context.DisplayText, "12");
+        }
     }
 }
