@@ -242,5 +242,27 @@ namespace WpfCalculator2025.Model.Tests
 
             Assert.AreEqual(_context.DisplayText, "7");
         }
+
+        [TestMethod()]
+        public void オペレータが未設定の状態で演算実行すると現在入力が結果になること()
+        {
+            var _context = new CalculatorContext();
+            _context.AddDigit("1");
+            _context.Compute();
+
+            Assert.AreEqual(_context.DisplayText, "1");
+        }
+
+        [TestMethod()]
+        public void オペレータを初期状態で連続入力すると表示文字列が初期値になること()
+        {
+            var _context = new CalculatorContext();
+            _context.Compute();
+            _context.Compute();
+            _context.Compute();
+
+            Assert.AreEqual(_context.DisplayText, "0");
+        }
+
     }
 }

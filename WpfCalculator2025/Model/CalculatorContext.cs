@@ -1,6 +1,4 @@
-﻿using System.Windows;
-
-namespace WpfCalculator2025.Model
+﻿namespace WpfCalculator2025.Model
 {
     /// <summary>
     /// 電卓の状態保持制御クラス
@@ -29,13 +27,7 @@ namespace WpfCalculator2025.Model
         /// 表示用文字列
         /// </summary>
         /// <returns></returns>
-        public string DisplayText
-        {
-            get
-            {
-                return string.IsNullOrEmpty(_currentInput) ? InitialDisplayTex : _displayText;
-            }
-        }
+        public string DisplayText => string.IsNullOrEmpty(_displayText) ? InitialDisplayTex : _displayText;
 
         /// <summary>
         /// 演算子
@@ -48,43 +40,37 @@ namespace WpfCalculator2025.Model
         public string PreviousInput => _previousInput;
 
         /// <summary>
+        /// 現在入力
+        /// </summary>
+        public string CurrentInput => _currentInput;
+
+        /// <summary>
+        /// 直前計算結果
+        /// </summary>
+        public string LastResult => _lastResult;
+
+        /// <summary>
         /// 演算実行直後判定
         /// </summary>
         /// <returns></returns>
         private bool isComputeJustEnterd => _lastInput == "=";
 
         /// <summary>
-        /// 演算子入力直後判定
-        /// </summary>
-        /// <returns></returns>
-        private bool isOperatorJustEnterd => "+-*/".IndexOf(_lastInput) >= 0;
-
-        /// <summary>
         /// 計算可能状態判定
         /// </summary>
         /// <returns></returns>
         private bool canConpute =>
-         !string.IsNullOrEmpty(_previousInput)
-                && !string.IsNullOrEmpty(_operator)
-                && !isComputeJustEnterd
-                && !isOperatorJustEnterd;
+                _previousInput != InitialPreviousInput
+                && _operator != InitialOperator
+                && _currentInput != InitialCurrentInput;
 
         /// <summary>
-        /// 入力桁追加
+        /// 現在入力値への桁追加
         /// </summary>
         /// <param name="input"></param>
         public void AddDigit(string input)
         {
-
-            if (string.IsNullOrEmpty(_currentInput) || isOperatorJustEnterd)
-            {
-                _currentInput = input;
-            }
-            else
-            {
-                _currentInput += input;
-            }
-
+            _currentInput += input;
             _displayText = _currentInput;
             _lastInput = input;
         }
@@ -99,6 +85,7 @@ namespace WpfCalculator2025.Model
             _previousInput = InitialPreviousInput;
             _lastInput = InitialLastInput;
             _lastResult = InitialLastResult;
+            _displayText = InitialDisplayTex;
         }
 
         /// <summary>
@@ -113,15 +100,25 @@ namespace WpfCalculator2025.Model
                 _previousInput = _lastResult;
             }
 
-            var previousValue = decimal.Parse(_previousInput);
-            var currentValue = decimal.Parse(_currentInput);
+            if (canConpute || (canConpute && isComputeJustEnterd))
+            {
+                var previousValue = decimal.Parse(_previousInput);
+                var currentValue = decimal.Parse(_currentInput);
 
-            // 演算子に該当する処理
-            var computeProcess = _computeProcessDispatcher.Dispatch(_operator);
-            var result = computeProcess.Compute(previousValue, currentValue);
+                // 演算子に該当する処理
+                var computeProcess = _computeProcessDispatcher.Dispatch(_operator);
+                var result = computeProcess.Compute(previousValue, currentValue);
 
-            _displayText = result.ToString();
-            _lastResult = result.ToString();
+                _displayText = result.ToString();
+                _lastResult = result.ToString();
+            }
+            else
+            {
+                // 計算した状態にする
+                var input = string.IsNullOrEmpty(_currentInput) ? "0" : _currentInput;
+                _previousInput = input;
+                _lastResult = input;
+            }
 
             _lastInput = inputOperator;
         }
@@ -132,7 +129,8 @@ namespace WpfCalculator2025.Model
         /// <param name="inputOperator">演算子文字列</param>
         public void SetOperator(string inputOperator)
         {
-            if (canConpute)
+            // 演算子で計算する場合の判定
+            if (canConpute && _lastResult == InitialLastResult)
             {
                 Compute(inputOperator);
             }
@@ -152,6 +150,8 @@ namespace WpfCalculator2025.Model
                 {
                     _previousInput = _currentInput;
                 }
+
+                _currentInput = InitialCurrentInput;
             }
 
             _operator = inputOperator;
