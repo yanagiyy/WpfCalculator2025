@@ -5,8 +5,58 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfCalculator2025"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="500" Width="400">
+    <Grid Margin="0,0,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1.1*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.Resources>
+            <Style TargetType="Button">
+                <Setter Property="FontSize" Value="32"></Setter>
+                <Setter Property="Margin" Value="5"></Setter>
+            </Style>
+        </Grid.Resources>
 
+        <!--ディスプレイ-->
+        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Margin="5" Background="#FFAED7D8">
+            <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,0,5,0" Text="0" TextAlignment="Right" FontSize="47" VerticalAlignment="Bottom"/>
+        </Grid>
+
+        <!--キーパッド-->
+        <Button Content="CE" Grid.Row="1" Grid.Column="0" />
+        <Button Content="C" Grid.Row="1" Grid.Column="1" />
+        <Button Content="←" Grid.Row="1" Grid.Column="2" />
+        <Button Content="÷" Grid.Row="1" Grid.Column="3" />
+
+        <Button Content="7" Grid.Row="2" Grid.Column="0" />
+        <Button Content="8" Grid.Row="2" Grid.Column="1" />
+        <Button Content="9" Grid.Row="2" Grid.Column="2" />
+        <Button Content="×" Grid.Row="2" Grid.Column="3" />
+
+        <Button Content="4" Grid.Row="3" Grid.Column="0" />
+        <Button Content="5" Grid.Row="3" Grid.Column="1" />
+        <Button Content="6" Grid.Row="3" Grid.Column="2" />
+        <Button Content="－" Grid.Row="3" Grid.Column="3" />
+
+        <Button Content="1" Grid.Row="4" Grid.Column="0" />
+        <Button Content="2" Grid.Row="4" Grid.Column="1" />
+        <Button Content="3" Grid.Row="4" Grid.Column="2" />
+        <Button Content="＋" Grid.Row="4" Grid.Column="3" />
+
+        <Button Content="+/-" Grid.Row="5" Grid.Column="0" />
+        <Button Content="0" Grid.Row="5" Grid.Column="1" />
+        <Button Content="." Grid.Row="5" Grid.Column="2" />
+        <Button Content="=" Grid.Row="5" Grid.Column="3" />
     </Grid>
 </Window>
