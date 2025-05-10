@@ -70,7 +70,26 @@
         /// <param name="input"></param>
         public void AddDigit(string input)
         {
-            _currentInput += input;
+            if (input == ".")
+            {
+                if (_currentInput == InitialCurrentInput)
+                {
+
+                    _currentInput = "0.";
+                }
+                else
+                {
+                    if (!_currentInput.Contains('.'))
+                    {
+                        _currentInput += input;
+                    }
+                }
+            }
+            else
+            {
+                _currentInput += input;
+            }
+
             _displayText = _currentInput;
             _lastInput = input;
         }

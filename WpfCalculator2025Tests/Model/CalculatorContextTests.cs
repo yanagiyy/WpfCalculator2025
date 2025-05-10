@@ -44,6 +44,27 @@ namespace WpfCalculator2025.Model.Tests
         }
 
         [TestMethod()]
+        public void 桁追加でゼロ表示に小数点を入力すると正しく表示文字列になること()
+        {
+            var _context = new CalculatorContext();
+            _context.AddDigit(".");
+
+            Assert.AreEqual(_context.DisplayText, "0.");
+        }
+
+        [TestMethod()]
+        public void 桁追加でゼロ表示に小数点を連続入力すると正しく表示文字列になること()
+        {
+            var _context = new CalculatorContext();
+            _context.AddDigit(".");
+            _context.AddDigit(".");
+            _context.AddDigit(".");
+            _context.AddDigit(".");
+
+            Assert.AreEqual(_context.DisplayText, "0.");
+        }
+
+        [TestMethod()]
         public void 全クリアを行うと表示文字列がゼロになること()
         {
             var _context = new CalculatorContext();
@@ -241,6 +262,42 @@ namespace WpfCalculator2025.Model.Tests
             _context.Compute();
 
             Assert.AreEqual(_context.DisplayText, "7");
+        }
+
+        [TestMethod()]
+        public void 演算実行で小数点を含んだ計算ができること()
+        {
+            var _context = new CalculatorContext();
+            _context.AddDigit("1");
+            _context.SetOperator("+");
+            _context.AddDigit("2.3");
+
+            _context.Compute();
+
+            Assert.AreEqual(_context.DisplayText, "3.3");
+
+            _context.ClearAll();
+
+            _context.AddDigit(".2");
+            _context.SetOperator("+");
+            _context.AddDigit("3");
+
+            _context.Compute();
+
+            Assert.AreEqual(_context.DisplayText, "3.2");
+        }
+
+        [TestMethod()]
+        public void 演算実行で小数点で終わる入力で計算ができること()
+        {
+            var _context = new CalculatorContext();
+            _context.AddDigit("1.");
+            _context.SetOperator("+");
+            _context.AddDigit("2.");
+
+            _context.Compute();
+
+            Assert.AreEqual(_context.DisplayText, "3");
         }
 
         [TestMethod()]
