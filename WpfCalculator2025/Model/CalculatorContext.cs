@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using log4net;
 
 namespace WpfCalculator2025.Model
 {
@@ -7,6 +8,8 @@ namespace WpfCalculator2025.Model
     /// </summary>
     public class CalculatorContext
     {
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(CalculatorContext));
+
         // 被演算対象の変数
         private decimal _operandA = 0M;
 
@@ -37,6 +40,62 @@ namespace WpfCalculator2025.Model
         /// 現在入力
         /// </summary>
         public string CurrentInput => _currentInput;
+
+        /// <summary>
+        /// 操作実行
+        /// </summary>
+        /// <param name="key">操作</param>
+        public void CommandExecuter(string key)
+        {
+            _logger.Info($"InputKey:{key}");
+
+            try
+            {
+                // 数字キー or ドット
+                if (char.IsDigit(key, 0) || key == ".")
+                {
+                    AddDigit(key);
+                }
+                // 演算子キー (+ - * /)
+                else if (key == "+" || key == "-" || key == "*" || key == "/")
+                {
+                    SetOperator(key);
+                }
+                // イコールキー
+                else if (key == "=")
+                {
+                    Compute();
+                }
+                // 全クリア（C）
+                else if (key == "C")
+                {
+                    ClearAll();
+                }
+                // それ以外
+                else
+                {
+                    // nop
+                }
+            }
+            catch (OverflowException ex)
+            {
+                _logger.Error(ex.ToString());
+
+                ClearAll();
+                // ほかの場所とも統一のためにリソース化すること
+                _displayText = "桁上限を超えました";
+
+            }
+            catch (Exception ex)
+            {
+                // 未ハンドリングの例外ハンドラー
+
+                _logger.Error(ex.ToString());
+
+                ClearAll();
+                _displayText = ex.Message;
+            }
+        }
 
         /// <summary>
         /// 現在入力値への桁追加
@@ -79,7 +138,7 @@ namespace WpfCalculator2025.Model
                 }
                 else
                 {
-                    // 文字数は定数化すること
+                    // 文字数は定数化することアプリ全体での利用を検討すること
                     // 小数点以下5桁までの入力可能とするための判定
                     if (!Regex.IsMatch(_currentInput, @"\.\d{5}$"))
                     {

@@ -47,7 +47,7 @@ namespace WpfCalculator2025.Model
             {
                 _logger.Error($"Executer processKey:{processKey},operadA:{operandA},operandB:{operandB},Exception: {ex.ToString()}");
 
-                // 失敗
+                // 失敗　//ほかの場所とも統一のためにリソース化すること
                 return (false, 0M, "扱える桁数を超えました");
             }
             catch (Exception ex)

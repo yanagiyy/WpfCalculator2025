@@ -7,6 +7,7 @@ namespace WpfCalculator2025.ViewModel
 {
     internal partial class MainViewModel : ObservableObject
     {
+        // アプリ全体で定義してプロセス側とも共用して仕様がずれないようにすること
         private const int MaxDecimals = 5;
 
         private CalculatorContext _calculatorContext = new CalculatorContext();
@@ -25,32 +26,9 @@ namespace WpfCalculator2025.ViewModel
         {
             _logger.Info($"InputKey:{key}");
 
-            // 数字キー or ドット
-            if (char.IsDigit(key, 0) || key == ".")
-            {
-                _calculatorContext.AddDigit(key);
-            }
-            // 演算子キー (+ - * /)
-            else if (key == "+" || key == "-" || key == "*" || key == "/")
-            {
-                _calculatorContext.SetOperator(key);
-            }
-            // イコールキー
-            else if (key == "=")
-            {
-                _calculatorContext.Compute();
-            }
-            // 全クリア（C）
-            else if (key == "C")
-            {
-                _calculatorContext.ClearAll();
-            }
-            // それ以外
-            else
-            {
-                // nop
-            }
+            _calculatorContext.CommandExecuter(key);
 
+            // 画面の変更が不要な場合もあるので必要な場合のみ実行するようにすること
             var raw = _calculatorContext.DisplayText;
             DisplayText = FormatTruncate(raw, MaxDecimals);
 
