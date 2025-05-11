@@ -9,23 +9,23 @@
         Title="MainWindow" Height="500" Width="400"
         d:DataContext="{d:DesignInstance Type=viewmodel:MainViewModel, IsDesignTimeCreatable=True}">
     <Window.DataContext>
-        <viewmodel:MainViewModel/>
+        <viewmodel:MainViewModel />
     </Window.DataContext>
-    
+
     <Grid Margin="0,0,0,0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="1.1*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="1.1*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid.Resources>
             <Style TargetType="Button">
@@ -36,30 +36,38 @@
 
         <!--ディスプレイ-->
         <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4" Margin="5" Background="#FFAED7D8">
-            <TextBlock Grid.Row="0" Grid.Column="0" Margin="5,0,5,0" Text="{Binding DisplayText}" TextAlignment="Right" FontSize="47" VerticalAlignment="Bottom"/>
+            <Viewbox Stretch="Uniform" StretchDirection="DownOnly" VerticalAlignment="Stretch" Margin="0,15,0,0" HorizontalAlignment="Right" Width="390">
+                <TextBlock Text="{Binding DisplayText}"
+                    TextAlignment="Right"
+                    FontSize="47"
+                    TextWrapping="NoWrap"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom" 
+                    Margin="50,0,0,0"/>
+            </Viewbox>
         </Grid>
 
         <!--キーパッド-->
-        <Button Content="C" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Command="{Binding KeyInputCommand}" CommandParameter="C"/>
-        <Button Content="÷" Grid.Row="1" Grid.Column="3" Command="{Binding KeyInputCommand}" CommandParameter="/"/>
+        <Button Content="C" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Command="{Binding KeyInputCommand}" CommandParameter="C" />
+        <Button Content="÷" Grid.Row="1" Grid.Column="3" Command="{Binding KeyInputCommand}" CommandParameter="/" />
 
-        <Button Content="7" Grid.Row="2" Grid.Column="0" Command="{Binding KeyInputCommand}" CommandParameter="7"/>
-        <Button Content="8" Grid.Row="2" Grid.Column="1" Command="{Binding KeyInputCommand}" CommandParameter="8"/>
-        <Button Content="9" Grid.Row="2" Grid.Column="2" Command="{Binding KeyInputCommand}" CommandParameter="9"/>
-        <Button Content="×" Grid.Row="2" Grid.Column="3" Command="{Binding KeyInputCommand}" CommandParameter="*"/>
+        <Button Content="7" Grid.Row="2" Grid.Column="0" Command="{Binding KeyInputCommand}" CommandParameter="7" />
+        <Button Content="8" Grid.Row="2" Grid.Column="1" Command="{Binding KeyInputCommand}" CommandParameter="8" />
+        <Button Content="9" Grid.Row="2" Grid.Column="2" Command="{Binding KeyInputCommand}" CommandParameter="9" />
+        <Button Content="×" Grid.Row="2" Grid.Column="3" Command="{Binding KeyInputCommand}" CommandParameter="*" />
 
-        <Button Content="4" Grid.Row="3" Grid.Column="0" Command="{Binding KeyInputCommand}" CommandParameter="4"/>
-        <Button Content="5" Grid.Row="3" Grid.Column="1" Command="{Binding KeyInputCommand}" CommandParameter="5"/>
-        <Button Content="6" Grid.Row="3" Grid.Column="2" Command="{Binding KeyInputCommand}" CommandParameter="6"/>
-        <Button Content="－" Grid.Row="3" Grid.Column="3" Command="{Binding KeyInputCommand}" CommandParameter="-"/>
+        <Button Content="4" Grid.Row="3" Grid.Column="0" Command="{Binding KeyInputCommand}" CommandParameter="4" />
+        <Button Content="5" Grid.Row="3" Grid.Column="1" Command="{Binding KeyInputCommand}" CommandParameter="5" />
+        <Button Content="6" Grid.Row="3" Grid.Column="2" Command="{Binding KeyInputCommand}" CommandParameter="6" />
+        <Button Content="－" Grid.Row="3" Grid.Column="3" Command="{Binding KeyInputCommand}" CommandParameter="-" />
 
-        <Button Content="1" Grid.Row="4" Grid.Column="0" Command="{Binding KeyInputCommand}" CommandParameter="1"/>
-        <Button Content="2" Grid.Row="4" Grid.Column="1" Command="{Binding KeyInputCommand}" CommandParameter="2"/>
-        <Button Content="3" Grid.Row="4" Grid.Column="2" Command="{Binding KeyInputCommand}" CommandParameter="3"/>
-        <Button Content="＋" Grid.Row="4" Grid.Column="3" Command="{Binding KeyInputCommand}" CommandParameter="+"/>
+        <Button Content="1" Grid.Row="4" Grid.Column="0" Command="{Binding KeyInputCommand}" CommandParameter="1" />
+        <Button Content="2" Grid.Row="4" Grid.Column="1" Command="{Binding KeyInputCommand}" CommandParameter="2" />
+        <Button Content="3" Grid.Row="4" Grid.Column="2" Command="{Binding KeyInputCommand}" CommandParameter="3" />
+        <Button Content="＋" Grid.Row="4" Grid.Column="3" Command="{Binding KeyInputCommand}" CommandParameter="+" />
 
-        <Button Content="0" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Command="{Binding KeyInputCommand}" CommandParameter="0"/>
-        <Button Content="." Grid.Row="5" Grid.Column="2" Command="{Binding KeyInputCommand}" CommandParameter="."/>
-        <Button Content="=" Grid.Row="5" Grid.Column="3" Command="{Binding KeyInputCommand}" CommandParameter="="/>
+        <Button Content="0" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Command="{Binding KeyInputCommand}" CommandParameter="0" />
+        <Button Content="." Grid.Row="5" Grid.Column="2" Command="{Binding KeyInputCommand}" CommandParameter="." />
+        <Button Content="=" Grid.Row="5" Grid.Column="3" Command="{Binding KeyInputCommand}" CommandParameter="=" />
     </Grid>
 </Window>
