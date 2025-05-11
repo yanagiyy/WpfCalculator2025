@@ -7,9 +7,13 @@ namespace WpfCalculator2025.Model
     /// </summary>
     public class CalculatorContext
     {
+        // 被演算対象の変数
         private decimal _operandA = 0M;
+
+        // この変数は連続演算の際の保持に利用するが使い方があいまいになっているので整理したほうがよい
         private decimal? _operandB = null;
 
+        // 初期化用の値は定数化すること
         private string _pendingOperation = "";
         private string _currentInput = "0";
         private string _displayText = "0";
@@ -40,9 +44,12 @@ namespace WpfCalculator2025.Model
         /// <param name="input"></param>
         public void AddDigit(string input)
         {
+            // 今は呼び出し側で担保しているが必要に応じてパラメータチェック追加すること
+
             // 次の値入力待ち状態か判定する
             if (_isWaitingNextOperand)
             {
+                // 初期化用の値は定数化すること
                 _currentInput = "0";
                 _isWaitingNextOperand = false;
             }
@@ -72,6 +79,7 @@ namespace WpfCalculator2025.Model
                 }
                 else
                 {
+                    // 文字数は定数化すること
                     // 小数点以下5桁までの入力可能とするための判定
                     if (!Regex.IsMatch(_currentInput, @"\.\d{5}$"))
                     {
@@ -88,6 +96,7 @@ namespace WpfCalculator2025.Model
         /// </summary>
         public void ClearAll()
         {
+            // 初期化用の値は定数化すること
             _currentInput = "0";
             _pendingOperation = "";
             _displayText = "0";
@@ -159,6 +168,9 @@ namespace WpfCalculator2025.Model
         /// <param name="inputOperator">演算子文字列</param>
         public void SetOperator(string inputOperator)
         {
+            // 今は呼び出し側で担保しているが必要に応じてパラメータチェック追加すること
+            // 演算子は文字型ではなく定義を作成するのが望ましい
+
             // 演算子による演算実行を判定
             if (_pendingOperation != "" && !_isWaitingNextOperand)
             {

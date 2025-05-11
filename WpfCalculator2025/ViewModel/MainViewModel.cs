@@ -59,11 +59,11 @@ namespace WpfCalculator2025.ViewModel
 
 
         /// <summary>
-        /// 指定桁数で切り捨て
+        /// 指定桁数で切り捨て　// とりあえず切り捨てしているが計算精度をどこに合わせるかをきめること
         /// </summary>
         /// <param name="text">元</param>
         /// <param name="maxDecimals">最大桁数</param>
-        /// <returns></returns>
+        /// <returns>成型後文字列</returns>
         private static string FormatTruncate(string text, int maxDecimals)
         {
             int dot = text.IndexOf('.');
