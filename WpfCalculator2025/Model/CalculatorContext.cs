@@ -132,11 +132,16 @@ namespace WpfCalculator2025.Model
                 }
 
                 // 演算子に該当する演算処理を実行
-                var computeProcess = _computeProcessDispatcher.Dispatch(_pendingOperation);
-                var result = computeProcess.Compute(_operandA, (decimal)_operandB);
+                var result = _computeProcessDispatcher.Executer(_pendingOperation, _operandA, (decimal)_operandB);
+                if (!result.IsSuccess)
+                {
+                    ClearAll();
+                    _displayText = result.Messsage;
+                    return;
+                }
 
-                _currentInput = result.ToString();
-                _displayText = result.ToString();
+                _currentInput = result.ResultValue.ToString();
+                _displayText = result.ResultValue.ToString();
             }
             else
             {
@@ -160,12 +165,16 @@ namespace WpfCalculator2025.Model
                 decimal inputOperand = decimal.Parse(_currentInput);
 
                 // 演算子に該当する演算処理を実行
-                var computeProcess = _computeProcessDispatcher.Dispatch(_pendingOperation);
-                var result = computeProcess.Compute(_operandA, inputOperand);
+                var result = _computeProcessDispatcher.Executer(_pendingOperation, _operandA, inputOperand);
+                if (!result.IsSuccess)
+                {
+                    ClearAll();
+                    _displayText = result.Messsage;
+                }
 
-                _operandA = result;
-                _currentInput = result.ToString();
-                _displayText = result.ToString();
+                _operandA = result.ResultValue;
+                _currentInput = result.ResultValue.ToString();
+                _displayText = result.ResultValue.ToString();
             }
             else
             {
