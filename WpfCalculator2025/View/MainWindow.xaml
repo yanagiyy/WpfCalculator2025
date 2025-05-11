@@ -40,9 +40,7 @@
         </Grid>
 
         <!--キーパッド-->
-        <Button Content="CE" Grid.Row="1" Grid.Column="0" Command="{Binding KeyInputCommand}" CommandParameter="CE"/>
-        <Button Content="C" Grid.Row="1" Grid.Column="1" Command="{Binding KeyInputCommand}" CommandParameter="C"/>
-        <Button Content="←" Grid.Row="1" Grid.Column="2" Command="{Binding KeyInputCommand}" CommandParameter="BS"/>
+        <Button Content="C" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Command="{Binding KeyInputCommand}" CommandParameter="C"/>
         <Button Content="÷" Grid.Row="1" Grid.Column="3" Command="{Binding KeyInputCommand}" CommandParameter="/"/>
 
         <Button Content="7" Grid.Row="2" Grid.Column="0" Command="{Binding KeyInputCommand}" CommandParameter="7"/>
@@ -60,8 +58,7 @@
         <Button Content="3" Grid.Row="4" Grid.Column="2" Command="{Binding KeyInputCommand}" CommandParameter="3"/>
         <Button Content="＋" Grid.Row="4" Grid.Column="3" Command="{Binding KeyInputCommand}" CommandParameter="+"/>
 
-        <Button Content="+/-" Grid.Row="5" Grid.Column="0" Command="{Binding KeyInputCommand}" CommandParameter="NEG"/>
-        <Button Content="0" Grid.Row="5" Grid.Column="1" Command="{Binding KeyInputCommand}" CommandParameter="0"/>
+        <Button Content="0" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Command="{Binding KeyInputCommand}" CommandParameter="0"/>
         <Button Content="." Grid.Row="5" Grid.Column="2" Command="{Binding KeyInputCommand}" CommandParameter="."/>
         <Button Content="=" Grid.Row="5" Grid.Column="3" Command="{Binding KeyInputCommand}" CommandParameter="="/>
     </Grid>
