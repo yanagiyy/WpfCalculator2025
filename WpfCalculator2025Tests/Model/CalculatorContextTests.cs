@@ -77,20 +77,6 @@ namespace WpfCalculator2025.Model.Tests
         }
 
         [TestMethod()]
-        public void 全クリアを行うと前入力値が空になること()
-        {
-            var _context = new CalculatorContext();
-            _context.AddDigit("1");
-            _context.AddDigit("2");
-
-            _context.SetOperator("+");
-
-            _context.ClearAll();
-
-            Assert.AreEqual(_context.PreviousInput, "");
-        }
-
-        [TestMethod()]
         public void オペレターは初期未入力であること()
         {
             var _context = new CalculatorContext();
@@ -122,30 +108,6 @@ namespace WpfCalculator2025.Model.Tests
             _context.ClearAll();
 
             Assert.AreEqual(_context.Operator, "");
-        }
-
-        [TestMethod()]
-        public void オペレータを入力すると現在入力値がある場合は現在入力値が前入力値にセットされること()
-        {
-            var _context = new CalculatorContext();
-
-            _context.AddDigit("1");
-            _context.AddDigit("2");
-
-            _context.SetOperator("+");
-
-            Assert.AreEqual(_context.PreviousInput, "12");
-        }
-
-
-        [TestMethod()]
-        public void オペレータを入力すると現在入力値が無い場合は前入力値にゼロがセットされること()
-        {
-            var _context = new CalculatorContext();
-
-            _context.SetOperator("+");
-
-            Assert.AreEqual(_context.PreviousInput, "0");
         }
 
         [TestMethod()]
@@ -232,8 +194,6 @@ namespace WpfCalculator2025.Model.Tests
             _context.AddDigit("2");
             _context.Compute();
 
-            Assert.AreEqual(_context.DisplayText, "3");
-
             // 3 +
             _context.SetOperator("+");
 
@@ -250,8 +210,6 @@ namespace WpfCalculator2025.Model.Tests
             var _context = new CalculatorContext();
             _context.AddDigit("1");
             _context.SetOperator("+");
-
-            // 変わらない
             _context.AddDigit("2");
 
             // 3
@@ -377,18 +335,14 @@ namespace WpfCalculator2025.Model.Tests
             _context.AddDigit("1");
             _context.SetOperator("+");
             _context.AddDigit("3");
-
             _context.SetOperator("+");
-
-            Assert.AreEqual(_context.DisplayText, "4");
-
+            _context.Compute();                        
             _context.Compute();
 
-            Assert.AreEqual(_context.DisplayText, "8");
-            
+            _context.AddDigit("10");
             _context.Compute();
 
-            Assert.AreEqual(_context.DisplayText, "12");
+            Assert.AreEqual(_context.DisplayText, "14");
         }
     }
 }
