@@ -8,6 +8,10 @@ namespace WpfCalculator2025.Model
     /// </summary>
     public class CalculatorContext
     {
+        // 入力桁数制限値
+        private const int MaxIntegerDigits = 12;
+        private const int MaxFractionDigits = 5;
+
         private static readonly ILog _logger = LogManager.GetLogger(typeof(CalculatorContext));
 
         // 被演算対象の変数
@@ -22,8 +26,15 @@ namespace WpfCalculator2025.Model
         private string _displayText = "0";
         private bool _isWaitingNextOperand = false;
 
+        private string _inputPatternReg;
+
         // 計算処理割り当て機能
         private readonly ComputeProcessDispatcher _computeProcessDispatcher = new ComputeProcessDispatcher();
+
+        public CalculatorContext()
+        {
+            _inputPatternReg = $@"^\d{{1,{MaxIntegerDigits}}}(\.\d{{0,{MaxFractionDigits}}})?$";
+        }
 
         /// <summary>
         /// 表示用文字列
@@ -138,11 +149,13 @@ namespace WpfCalculator2025.Model
                 }
                 else
                 {
-                    // 文字数は定数化することアプリ全体での利用を検討すること
-                    // 小数点以下5桁までの入力可能とするための判定
-                    if (!Regex.IsMatch(_currentInput, @"\.\d{5}$"))
+                    if (Regex.IsMatch(_currentInput + input, _inputPatternReg))
                     {
                         _currentInput += input;
+                    }
+                    else
+                    {
+                        _logger.Warn("入力最大桁数制限のため入力無視しました");
                     }
                 }
             }
