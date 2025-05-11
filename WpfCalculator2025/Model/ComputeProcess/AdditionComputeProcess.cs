@@ -3,7 +3,7 @@
     /// <summary>
     /// 加算
     /// </summary>
-    class AddComputeProcess : IComputeProcess
+    class AdditionComputeProcess : IComputeProcess
     {
         public string Operator => "+";
 

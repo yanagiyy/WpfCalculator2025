@@ -16,7 +16,7 @@ namespace WpfCalculator2025.Model
             _processMap =
             [
                 // 処理を追加する場合はIComputeProcessを実装した演算処理を登録してください
-                new AddComputeProcess(),
+                new AdditionComputeProcess(),
                 new DivisionComputeProcess(),
                 new MultiplicationComputeProcess(),
                 new SubtractionComputeProcess(),
