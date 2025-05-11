@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using log4net;
 
 namespace WpfCalculator2025.Model
 {
@@ -7,42 +8,44 @@ namespace WpfCalculator2025.Model
     /// </summary>
     public class CalculatorContext
     {
-        private const string InitialCurrentInput = "";
-        private const string InitialDisplayTex = "0";
-        private const string InitialOperator = "";
-        private const string InitialPreviousInput = "";
-        private const string InitialLastInput = "";
-        private const string InitialLastResult = "";
+        // 入力桁数制限値
+        private const int MaxIntegerDigits = 12;
+        private const int MaxFractionDigits = 5;
 
-        private string _currentInput = InitialCurrentInput;
-        private string _operator = InitialOperator;
-        private string _previousInput = InitialPreviousInput;
-        private string _displayText = InitialDisplayTex;
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(CalculatorContext));
 
-        private string _lastInput = InitialLastInput;
-        private bool _isSetOperatorJust;
-        private string _lastResult = InitialLastResult;
+        // 被演算対象の変数
+        private decimal _operandA = 0M;
 
-        private bool _isComputeJustExecuted = false;
+        // この変数は連続演算の際の保持に利用するが使い方があいまいになっているので整理したほうがよい
+        private decimal? _operandB = null;
+
+        // 初期化用の値は定数化すること
+        private string _pendingOperation = "";
+        private string _currentInput = "0";
+        private string _displayText = "0";
+        private bool _isWaitingNextOperand = false;
+
+        private string _inputPatternReg;
 
         // 計算処理割り当て機能
         private readonly ComputeProcessDispatcher _computeProcessDispatcher = new ComputeProcessDispatcher();
+
+        public CalculatorContext()
+        {
+            _inputPatternReg = $@"^\d{{1,{MaxIntegerDigits}}}(\.\d{{0,{MaxFractionDigits}}})?$";
+        }
 
         /// <summary>
         /// 表示用文字列
         /// </summary>
         /// <returns></returns>
-        public string DisplayText => string.IsNullOrEmpty(_displayText) ? InitialDisplayTex : _displayText;
+        public string DisplayText => _displayText;
 
         /// <summary>
         /// 演算子
         /// </summary>
-        public string Operator => _operator;
-
-        /// <summary>
-        /// 被オペラント
-        /// </summary>
-        public string PreviousInput => _previousInput;
+        public string Operator => _pendingOperation;
 
         /// <summary>
         /// 現在入力
@@ -50,24 +53,60 @@ namespace WpfCalculator2025.Model
         public string CurrentInput => _currentInput;
 
         /// <summary>
-        /// 直前計算結果
+        /// 操作実行
         /// </summary>
-        public string LastResult => _lastResult;
+        /// <param name="key">操作</param>
+        public void CommandExecuter(string key)
+        {
+            _logger.Info($"InputKey:{key}");
 
-        /// <summary>
-        /// 演算実行直後判定
-        /// </summary>
-        /// <returns></returns>
-        //private bool isComputeJustEnterd => _lastInput == "=";
+            try
+            {
+                // 数字キー or ドット
+                if (char.IsDigit(key, 0) || key == ".")
+                {
+                    AddDigit(key);
+                }
+                // 演算子キー (+ - * /)
+                else if (key == "+" || key == "-" || key == "*" || key == "/")
+                {
+                    SetOperator(key);
+                }
+                // イコールキー
+                else if (key == "=")
+                {
+                    Compute();
+                }
+                // 全クリア（C）
+                else if (key == "C")
+                {
+                    ClearAll();
+                }
+                // それ以外
+                else
+                {
+                    // nop
+                }
+            }
+            catch (OverflowException ex)
+            {
+                _logger.Error(ex.ToString());
 
-        /// <summary>
-        /// 計算可能状態判定
-        /// </summary>
-        /// <returns></returns>
-        private bool canConpute =>
-                _previousInput != InitialPreviousInput
-                && _operator != InitialOperator
-                && _currentInput != InitialCurrentInput;
+                ClearAll();
+                // ほかの場所とも統一のためにリソース化すること
+                _displayText = "桁上限を超えました";
+
+            }
+            catch (Exception ex)
+            {
+                // 未ハンドリングの例外ハンドラー
+
+                _logger.Error(ex.ToString());
+
+                ClearAll();
+                _displayText = ex.Message;
+            }
+        }
 
         /// <summary>
         /// 現在入力値への桁追加
@@ -75,42 +114,53 @@ namespace WpfCalculator2025.Model
         /// <param name="input"></param>
         public void AddDigit(string input)
         {
-            if (input == ".")
-            {
-                if (_currentInput == InitialCurrentInput)
-                {
+            // 今は呼び出し側で担保しているが必要に応じてパラメータチェック追加すること
 
-                    _currentInput = "0.";
+            // 次の値入力待ち状態か判定する
+            if (_isWaitingNextOperand)
+            {
+                // 初期化用の値は定数化すること
+                _currentInput = "0";
+                _isWaitingNextOperand = false;
+            }
+
+            // 初期状態であるか判定
+            if (_currentInput == "0")
+            {
+                if (input == ".")
+                {
+                    // 小数点が未入力であれば入力する
+                    _currentInput += input;
                 }
                 else
                 {
-                    if (!_currentInput.Contains('.'))
-                    {
-                        _currentInput += input;
-                    }
+                    _currentInput = input;
                 }
             }
             else
             {
-                // 演算子入力直後
-                if (_isSetOperatorJust)
+                if (input == ".")
                 {
-                    _currentInput = input;
-        
+                    if (!_currentInput.Contains('.'))
+                    {
+                        // 小数点が未入力であれば入力する
+                        _currentInput += input;
+                    }
                 }
                 else
                 {
-                    if (!Regex.IsMatch(_currentInput, @"\.\d{5}$"))
+                    if (Regex.IsMatch(_currentInput + input, _inputPatternReg))
                     {
                         _currentInput += input;
+                    }
+                    else
+                    {
+                        _logger.Warn("入力最大桁数制限のため入力無視しました");
                     }
                 }
             }
 
             _displayText = _currentInput;
-            _lastInput = input;
-            _isSetOperatorJust = false;
-            _isComputeJustExecuted = false;
         }
 
         /// <summary>
@@ -118,59 +168,70 @@ namespace WpfCalculator2025.Model
         /// </summary>
         public void ClearAll()
         {
-            _currentInput = InitialCurrentInput;
-            _operator = InitialOperator;
-            _previousInput = InitialPreviousInput;
-            _lastInput = InitialLastInput;
-            _lastResult = InitialLastResult;
-            _displayText = InitialDisplayTex;
-            _isComputeJustExecuted = false;
+            // 初期化用の値は定数化すること
+            _currentInput = "0";
+            _pendingOperation = "";
+            _displayText = "0";
+
+            _operandA = 0M;
+            _operandB = null;
+
+            _isWaitingNextOperand = false;
         }
 
         /// <summary>
         /// 演算実行
         /// </summary>
         /// <exception cref="NotImplementedException"></exception>
-        public void Compute(string inputOperator = "=")
+        public void Compute()
         {
-            if (_lastInput == "=" && inputOperator == "=")
+            if (_pendingOperation != "")
             {
-                // 連続演算の場合は直前の結果に対して同じ計算を繰り返す
-                _previousInput = _lastResult;
-            }
+                if (_isWaitingNextOperand)
+                {
+                    // --数値が未入力（演算子や＝が入力された直後）の場合
 
+                    if (_operandB == null)
+                    {
+                        _operandB = decimal.Parse(_currentInput);
+                    }
 
+                    _operandA = decimal.Parse(_currentInput);
+                }
+                else
+                {
+                    // --数値が入力されている場合
 
-            if (_operator == InitialOperator)
-            {
-                _lastResult = _currentInput;
-                _displayText = _currentInput;
+                    if (_operandB == null)
+                    {
+                        _operandB = decimal.Parse(_currentInput);
+                    }
+                    else
+                    {
+                        _operandA = decimal.Parse(_currentInput);
+                    }
+                }
+
+                // 演算子に該当する演算処理を実行
+                var result = _computeProcessDispatcher.Executer(_pendingOperation, _operandA, (decimal)_operandB);
+                if (!result.IsSuccess)
+                {
+                    ClearAll();
+                    _displayText = result.Messsage;
+                    return;
+                }
+
+                _currentInput = result.ResultValue.ToString();
+                _displayText = result.ResultValue.ToString();
             }
             else
             {
-                var previousValue = _previousInput == InitialPreviousInput ? 0 : decimal.Parse(_previousInput);
-                var currentValue = _currentInput == InitialCurrentInput ? 0 : decimal.Parse(_currentInput);               
-
-                // 演算子に該当する処理
-                var computeProcess = _computeProcessDispatcher.Dispatch(_operator);
-                var result = computeProcess.Compute(previousValue, currentValue);
-
-                //_currentInput = result.ToString();
-                _isComputeJustExecuted = true;
-                _displayText = result.ToString();
-                _lastResult = result.ToString();
+                // 演算子が未入力の場合 3= 0=のみ は入力値を被オペランドにする
+                _operandA = decimal.Parse(_currentInput);
             }
 
-            //}
-            //else
-            //{
-            //    // 計算した状態にする
-            //    var input = string.IsNullOrEmpty(_currentInput) ? "0" : _currentInput;
-            //    _previousInput = input;
-            //    _lastResult = input;
-            //}
-
-            _lastInput = inputOperator;
+            // 次の数値入力待ちとする
+            _isWaitingNextOperand = true;
         }
 
         /// <summary>
@@ -179,39 +240,45 @@ namespace WpfCalculator2025.Model
         /// <param name="inputOperator">演算子文字列</param>
         public void SetOperator(string inputOperator)
         {
-            if(_lastInput == "=")
-            {
-                _operator = InitialOperator;
-            }
+            // 今は呼び出し側で担保しているが必要に応じてパラメータチェック追加すること
+            // 演算子は文字型ではなく定義を作成するのが望ましい
 
-            // 演算子で計算する場合の判定
-            if (canConpute && !_isSetOperatorJust)
+            // 演算子による演算実行を判定
+            if (_pendingOperation != "" && !_isWaitingNextOperand)
             {
-                Compute(inputOperator);
-            }
+                decimal inputOperand = decimal.Parse(_currentInput);
 
-            if (_currentInput == InitialCurrentInput)
-            {
-                // 現在値が未入力での演算子設定時はゼロとする
-                _previousInput = "0";
+                // 演算子に該当する演算処理を実行
+                var result = _computeProcessDispatcher.Executer(_pendingOperation, _operandA, inputOperand);
+                if (!result.IsSuccess)
+                {
+                    ClearAll();
+                    _displayText = result.Messsage;
+                }
+
+                _operandA = result.ResultValue;
+                _currentInput = result.ResultValue.ToString();
+                _displayText = result.ResultValue.ToString();
             }
             else
             {
-                if (_isComputeJustExecuted)
+                if (_isWaitingNextOperand)
                 {
-                    _previousInput = _lastResult;
+                    _operandB = null;
+                    _operandA = decimal.Parse(_currentInput);
                 }
-                else 
+                else
                 {
-                    _previousInput = _currentInput;
+                    // 現在の入力値を被オペランドとして保存
+                    _operandA = decimal.Parse(_currentInput);
                 }
-
-               // _currentInput = InitialCurrentInput;
             }
 
-            _operator = inputOperator;
-            _lastInput = inputOperator;
-            _isSetOperatorJust = true;
+            // 入力された演算子を保存
+            _pendingOperation = inputOperator;
+
+            // 次の数値入力待ちとする
+            _isWaitingNextOperand = true;
         }
     }
 }

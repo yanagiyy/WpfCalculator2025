@@ -1,15 +1,15 @@
 ﻿namespace WpfCalculator2025.Model.ComputeProcess
 {
     /// <summary>
-    /// 加算
+    /// 乗算
     /// </summary>
-    class AddComputeProcess : IComputeProcess
+    class MultiplicationComputeProcess : IComputeProcess
     {
-        public string Operator => "+";
+        public string Operator => "*";
 
         public decimal Compute(decimal x, decimal y)
         {
-            return x + y;
+            return x * y;
         }
     }
 }
