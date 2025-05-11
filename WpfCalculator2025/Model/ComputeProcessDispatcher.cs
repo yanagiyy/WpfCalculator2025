@@ -17,11 +17,14 @@ namespace WpfCalculator2025.Model
             [
                 // 処理を追加する場合はIComputeProcessを実装した演算処理を登録してください
                 new AddComputeProcess(),
+                new DivisionComputeProcess(),
+                new MultiplicationComputeProcess(),
+                new SubtractionComputeProcess(),
             ];
         }
 
         /// <summary>
-        /// 実行 // Dispatcherの責務ではないので別クラスにすることが望ましいので専用クラスに移設してください
+        /// 実行 // Dispatcherの責務ではないので別クラスにすることが望ましく専用クラスに移設してください
         /// </summary>
         /// <param name="processKey">演算子</param>
         /// <param name="operandA"></param>
