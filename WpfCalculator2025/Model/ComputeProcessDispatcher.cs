@@ -43,12 +43,17 @@ namespace WpfCalculator2025.Model
                 // 成功
                 return (true, result, string.Empty);
             }
+            catch (OverflowException ex)
+            {
+                _logger.Error($"Executer processKey:{processKey},operadA:{operandA},operandB:{operandB},Exception: {ex.ToString()}");
+
+                // 失敗
+                return (false, 0M, "扱える桁数を超えました");
+            }
             catch (Exception ex)
             {
-                // 必要に応じて例外区別をすること
+                _logger.Error($"Executer processKey:{processKey},operadA:{operandA},operandB:{operandB},Exception: {ex.ToString()}");
 
-                _logger.Error($"Executer processKey:{processKey},operadA:{operandA},operandB:{operandB},Exception: {ex.ToString()}"); 
-                
                 // 失敗
                 return (false, 0M, ex.Message);
             }
